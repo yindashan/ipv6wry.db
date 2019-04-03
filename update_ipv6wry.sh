@@ -43,6 +43,7 @@ if [[ ${now_version} -gt ${max_history_version} ]]; then
 
     # 提交更新
     DATE=`date +%Y-%m-%d`
+    git add .
     git commit -a -m ":arrow_up: Daily update at $DATE"
     git push
 fi
