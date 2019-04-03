@@ -7,6 +7,10 @@ ZXINC_IP_7Z='http://ip.zxinc.org/ip.7z'
 TMP_DIR='/tmp'
 USER_AGENT="UpdateBot@Rhilip/${VERSION}"
 
+# 跳转到脚本所在目录
+SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
+cd $SHELL_FOLDER
+
 # 获得历史存档，并得到最后一个更新历史
 max_history_version=0
 for i in $(ls './history'); do
