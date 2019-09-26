@@ -16,7 +16,10 @@
 因为本人最近需要使用ipv6数据库，但遗憾的是，GitHub上对纯真ip数据库(`qqwry.dat`)有较多的自动更新脚本，
 而该`ipv6wry.db`的关注度较少，没有，所以便准备自己造个轮子2333。
 
-# 目录说明
+本repo通过请求官网API - `http[s]://www.zxinc.org/update.php?app=ipv6db[&type=xml|json]`，检测官网是否存在更新。
+并通过响应结果，下载并存档最新的ipv6wry数据库。
+
+## 目录说明
 
  - `history/`: 历史数据，子目录以`YYYYMMDD`8位日期格式组织，可以从这里获取历史ip库文件
  - `parser/`: IPDB格式解析脚本，来自官网文件解压。目前包含`cpp`,`python`的解析方式
@@ -24,7 +27,7 @@
  - `ipv6wry-country.db`: IPDB格式数据库（仅精确到国家），用于其他软件获取最新ip库
  - `update_ipv6wry.sh`: 自动更新脚本，可以用来自行集成获取ip库能力
 
-# IPDB格式说明
+## IPDB格式说明
 
 ```
 文件头
@@ -51,13 +54,13 @@ struct{
 }索引[记录数];
 ```
 
-# 依赖安装
+## 依赖安装
 
 ```bash
-sudo apt-get install p7zip-full
+sudo apt-get install p7zip-full jq
 ```
 
-# 更新历史
+## 更新历史
 
 | 日期 | IP数据记录 | 数据库大小 |
 | :--: | :--------: | :-------: |
@@ -68,7 +71,7 @@ sudo apt-get install p7zip-full
 | 20190812 | 117291 | 1.68MiB | 
 <!-- update info here -->
 
-# License
+## License
 
 本Repo采用`GPL-2.0`协议，具体请见 `LICENSE` 文件
 

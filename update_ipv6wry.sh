@@ -1,8 +1,8 @@
 #!/bin/bash bash
 
 # 变量定义
-VERSION='0.0.1'
-ZXINC_URL='http://ip.zxinc.org/'
+VERSION='0.0.2'
+ZXINC_CHECK_URL='https://www.zxinc.org/update.php?app=ipv6db&type=json'
 ZXINC_IP_7Z='http://ip.zxinc.org/ip.7z'
 TMP_DIR='/tmp'
 USER_AGENT="UpdateBot@Rhilip/${VERSION}"
@@ -19,7 +19,7 @@ for i in $(ls './history'); do
 done
 
 # 请求当前页面信息并获取更新日期
-now_version=$(($(curl -L "${ZXINC_URL}" -H "User-Agent: ${USER_AGENT}"  | grep -E -o "下载IPv6地址数据库 \(版本[0-9]{8}" | grep -E -o "[0-9]{8}" ) + 0))
+now_version=$(($(curl -L "${ZXINC_CHECK_URL}" -H "User-Agent: ${USER_AGENT}" | jq -r '.newver' ) + 0))
 
 # 比较查看是否存在更新
 if [[ ${now_version} -gt ${max_history_version} ]]; then
