@@ -1,4 +1,4 @@
-#!/bin/bash bash
+#/bin/bash bash
 
 # 变量定义
 VERSION='0.0.2'
@@ -22,7 +22,7 @@ done
 now_version=$(($(curl -L "${ZXINC_CHECK_URL}" -H "User-Agent: ${USER_AGENT}" | jq -r '.newver' ) + 0))
 
 # 比较查看是否存在更新
-if [[ ${now_version} -gt ${max_history_version} ]]; then
+if [[ ${now_version} -gt ${max_history_version} || $1 == "--force" ]]; then
     # 下载数据包到临时目录并解压缩
     wget ${ZXINC_IP_7Z} -P "${TMP_DIR}"
     7z x "${TMP_DIR}/ip.7z" -y -o"${TMP_DIR}/ipv6_${now_version}"
