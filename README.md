@@ -72,6 +72,7 @@ sudo apt-get install p7zip-full jq
 | 20191031 | 123693 | 1.77MiB | 
 | 20191130 | 132557 | 1.90MiB | 
 | 20191130 | 132557 | 1.90MiB | 
+| 20191130 | 132557 | 1.90MiB | 
 <!-- update info here -->
 
 ## License
