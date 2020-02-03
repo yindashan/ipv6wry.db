@@ -22,7 +22,7 @@
 ## 目录说明
 
  - `history/`: 历史数据，子目录以`YYYYMMDD`8位日期格式组织，可以从这里获取历史ip库文件
- - `parser/`: IPDB格式解析脚本，来自官网文件解压。目前包含`cpp`,`python`的解析方式
+ - `parser/`: IPDB格式解析脚本，来自官网文件解压。目前包含`cpp`,`python`,`php`的解析方式
  - `ipv6wry.db`: 当前最新的IPDB格式数据库（**主文件，国内精确到县市**），用于其他软件获取最新ip库
  - `ipv6wry-country.db`: IPDB格式数据库（仅精确到国家），用于其他软件获取最新ip库
  - `update_ipv6wry.sh`: 自动更新脚本，可以用来自行集成获取ip库能力
