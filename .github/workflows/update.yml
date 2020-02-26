@@ -39,25 +39,22 @@ jobs:
       if: ${{ steps.current-history.outputs.current }} -gt ${{ steps.last-history.outputs.last }}
       working-directory: ./temp
       run: |
-          wget ${{ env.ZXINC_IP_7Z }} -P ${{ runner.temp }}
-          7z x "${{ runner.temp }}/ip.7z" -y -o"${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}"
+        wget ${{ env.ZXINC_IP_7Z }} -P ${{ runner.temp }}
+        7z x "${{ runner.temp }}/ip.7z" -y -o"${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}"
 
-          mkdir "./history/${{ steps.current-history.outputs.now }}"
-          cp ${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/*.db "./history/${{ steps.current-history.outputs.now }}"
-          rm ./*.db  # 移除当前目录下的`ipv6wry.db`
-          cp ${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/*.db "./"
+        mkdir "./history/${{ steps.current-history.outputs.now }}"
+        cp ${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/*.db "./history/${{ steps.current-history.outputs.now }}"
+        rm ./*.db  # 移除当前目录下的`ipv6wry.db`
+        cp ${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/*.db "./"
 
-          # 获得更新信息
-          db_count=$(cat "${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/说明.txt" | grep -E -o "IP数据记录：[0-9]*" | grep -E -o "[0-9]*")
-          db_size=$(cat "${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/说明.txt" | grep -E -o "数据库大小：.*MiB" | sed "s/数据库大小：//g")
+        db_count=$(cat "${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/说明.txt" | grep -E -o "IP数据记录：[0-9]*" | grep -E -o "[0-9]*")
+        db_size=$(cat "${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/说明.txt" | grep -E -o "数据库大小：.*MiB" | sed "s/数据库大小：//g")
 
-          # 更新历史 (README.md中的 IP数据记录 | 数据库大小 信息)
-          sed -i "s/当前版本: \`[0-9]\{8\}\`/当前版本: \`${{ steps.current-history.outputs.now }}\`/g"  README.md
-          sed -i "s/<\!-- update info here -->/| ${{ steps.current-history.outputs.now }} \| ${db_count} \| ${db_size} \| \n<\!-- update info here -->/" README.md
+        sed -i "s/当前版本: \`[0-9]\{8\}\`/当前版本: \`${{ steps.current-history.outputs.now }}\`/g"  README.md
+        sed -i "s/<\!-- update info here -->/| ${{ steps.current-history.outputs.now }} \| ${db_count} \| ${db_size} \| \n<\!-- update info here -->/" README.md
 
-          # 清理临时文件
-          rm -rf "$${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}"
-          rm "${{ runner.temp }}/ip.7z"
+        rm -rf "${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}"
+        rm "${{ runner.temp }}/ip.7z"
     
     - name: Commit files
       if: ${{ steps.current-history.outputs.current }} -gt ${{ steps.last-history.outputs.last }}
