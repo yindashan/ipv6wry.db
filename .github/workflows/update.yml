@@ -1,0 +1,77 @@
+name: Daily Check for update
+
+on:
+  schedule:
+    - cron:  '0 0 */1 * *'
+
+env:
+  ZXINC_CHECK_URL: 'https://www.zxinc.org/update.php?app=ipv6db&type=json'
+  ZXINC_IP_7Z:  'http://ip.zxinc.org/ip.7z'
+  USER_AGENT: 'UpdateBot@Rhilip/0.0.2'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install Dependence
+      run: sudo apt-get install p7zip-full jq
+    
+    - name: Get last version
+      id: last-history
+      run: |
+        max_history_version=0
+        for i in $(ls './history'); do
+            test_version=$((${i} + 0))
+            [[ ${test_version} -gt ${max_history_version} ]] && max_history_version=${test_version}
+        done
+        echo "::set-output name=last::$(max_history_version)"
+    
+    - name: Get current version
+      id: current-history
+      run: |
+        echo "::set-output name=now::$(($(curl -L "${ZXINC_CHECK_URL}" -H "User-Agent: ${USER_AGENT}" | jq -r '.newver' ) + 0))"
+        
+    - name: Unpack New version
+      id: unpack-new
+      if: ${{ steps.current-history.outputs.now }} -gt ${{ steps.last-history.outputs.last }}
+      working-directory: ./temp
+      run: |
+          wget ${{ env.ZXINC_IP_7Z }} -P "${{ runner.temp }}"
+          7z x "${{ runner.temp }}/ip.7z" -y -o"${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}"
+
+          mkdir "./history/${{ steps.current-history.outputs.now }}"
+          cp ${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/*.db "./history/${{ steps.current-history.outputs.now }}"
+          rm ./*.db  # 移除当前目录下的`ipv6wry.db`
+          cp ${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/*.db "./"
+
+          # 获得更新信息
+          db_count=$(cat "${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/说明.txt" | grep -E -o "IP数据记录：[0-9]*" | grep -E -o "[0-9]*")
+          db_size=$(cat "${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}/说明.txt" | grep -E -o "数据库大小：.*MiB" | sed "s/数据库大小：//g")
+
+          # 更新历史 (README.md中的 IP数据记录 | 数据库大小 信息)
+          sed -i "s/当前版本: \`[0-9]\{8\}\`/当前版本: \`${{ steps.current-history.outputs.now }}\`/g"  README.md
+          sed -i "s/<\!-- update info here -->/| ${{ steps.current-history.outputs.now }} \| ${db_count} \| ${db_size} \| \n<\!-- update info here -->/" README.md
+
+          # 清理临时文件
+          rm -rf "$${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}"
+          rm "${{ runner.temp }}/ip.7z"
+    
+    - name: Commit files
+      if: ${{ steps.current-history.outputs.now }} -gt ${{ steps.last-history.outputs.last }}
+      run: |
+        DATE=`date +%Y-%m-%d`
+        git add .
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -a -m ":arrow_up: Daily update at $DATE"
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      if: ${{ steps.current-history.outputs.now }} -gt ${{ steps.last-history.outputs.last }}
+      with:
+        github_token: ${{ secrets.DEPLOY_KEY }}
+  
