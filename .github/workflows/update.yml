@@ -7,7 +7,6 @@ on:
 env:
   ZXINC_CHECK_URL: 'https://www.zxinc.org/update.php?app=ipv6db&type=json'
   ZXINC_IP_7Z:  'http://ip.zxinc.org/ip.7z'
-  USER_AGENT: 'UpdateBot@Rhilip/0.0.2'
 
 jobs:
   build:
@@ -33,14 +32,14 @@ jobs:
     - name: Get current version
       id: current-history
       run: |
-        echo "::set-output name=now::$(($(curl -L "${ZXINC_CHECK_URL}" -H "User-Agent: ${USER_AGENT}" | jq -r '.newver' ) + 0))"
-        
+        echo "::set-output name=current::$(($(curl -L ${{ env.ZXINC_CHECK_URL }} | jq -r '.newver' ) + 0))"
+
     - name: Unpack New version
       id: unpack-new
-      if: ${{ steps.current-history.outputs.now }} -gt ${{ steps.last-history.outputs.last }}
+      if: ${{ steps.current-history.outputs.current }} -gt ${{ steps.last-history.outputs.last }}
       working-directory: ./temp
       run: |
-          wget ${{ env.ZXINC_IP_7Z }} -P "${{ runner.temp }}"
+          wget ${{ env.ZXINC_IP_7Z }} -P ${{ runner.temp }}
           7z x "${{ runner.temp }}/ip.7z" -y -o"${{ runner.temp }}/ipv6_${{ steps.current-history.outputs.now }}"
 
           mkdir "./history/${{ steps.current-history.outputs.now }}"
@@ -61,7 +60,7 @@ jobs:
           rm "${{ runner.temp }}/ip.7z"
     
     - name: Commit files
-      if: ${{ steps.current-history.outputs.now }} -gt ${{ steps.last-history.outputs.last }}
+      if: ${{ steps.current-history.outputs.current }} -gt ${{ steps.last-history.outputs.last }}
       run: |
         DATE=`date +%Y-%m-%d`
         git add .
@@ -71,7 +70,7 @@ jobs:
 
     - name: Push changes
       uses: ad-m/github-push-action@master
-      if: ${{ steps.current-history.outputs.now }} -gt ${{ steps.last-history.outputs.last }}
+      if: ${{ steps.current-history.outputs.current }} -gt ${{ steps.last-history.outputs.last }}
       with:
         github_token: ${{ secrets.DEPLOY_KEY }}
   
