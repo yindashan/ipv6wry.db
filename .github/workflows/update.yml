@@ -15,10 +15,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
-    - name: Install Dependence
-      run: sudo apt-get install p7zip-full jq
-    
+
     - name: Get last version
       id: last-history
       run: |
@@ -27,12 +24,12 @@ jobs:
             test_version=$((${i} + 0))
             [[ ${test_version} -gt ${max_history_version} ]] && max_history_version=${test_version}
         done
-        echo "::set-output name=last::$(max_history_version)"
-    
+        echo "::set-output name=last::${max_history_version}"
+
     - name: Get current version
       id: current-history
       run: |
-        echo "::set-output name=current::$(($(curl -L ${{ env.ZXINC_CHECK_URL }} | jq -r '.newver' ) + 0))"
+        echo "::set-output name=current::$(($(curl -L "${{ env.ZXINC_CHECK_URL }}" | jq -r '.newver' ) + 0))"
 
     - name: Unpack New version
       id: unpack-new
