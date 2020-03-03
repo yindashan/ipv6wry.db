@@ -2,7 +2,7 @@ name: Daily Check for update
 
 on:
   schedule:
-    - cron:  '0 0 */1 * *'
+    - cron:  '0 23 */1 * *'
 
 env:
   ZXINC_CHECK_URL: 'https://www.zxinc.org/update.php?app=ipv6db&type=json'
